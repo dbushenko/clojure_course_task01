@@ -2,6 +2,15 @@
   (:require [pl.danieljanus.tagsoup :refer :all])
   (:gen-class))
 
+(defn traverse-and-collect [data acc]
+  (reduce (fn [acc' v]
+            (if (and (= :a (first v))
+                     (= "l" (:class (get v 1))))
+              (conj acc'
+                    (:href (get v 1)))
+              (traverse-and-collect v acc')))
+          acc
+          (filter vector? data)))
 
 (defn get-links []
 " 1) Find all elements containing {:class \"r\"}.
@@ -21,7 +30,7 @@ The link from the example above is 'https://github.com/clojure/clojure'.
 Example: ['https://github.com/clojure/clojure', 'http://clojure.com/', . . .]
 "
   (let [data (parse "clojure_google.html")]
-    nil))
+    (traverse-and-collect data [])))
 
 (defn -main []
   (println (str "Found " (count (get-links)) " links!")))
