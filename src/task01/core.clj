@@ -21,9 +21,15 @@ The link from the example above is 'https://github.com/clojure/clojure'.
 Example: ['https://github.com/clojure/clojure', 'http://clojure.com/', . . .]
 "
   (let [data (parse "clojure_google.html")]
-    nil))
+    (letfn [(find-r [acc x]
+              (cond (not (and (vector? x) (map? (x 1)))) acc
+                    (= "r" (:class (x 1))) (conj acc x)
+                    :else (doall (reduce find-r acc (subvec x 2)))))
+            (extract-href [x]
+              (:href ((x 2) 1)))]
+      (map extract-href (find-r [] data)))))
 
 (defn -main []
   (println (str "Found " (count (get-links)) " links!")))
 
-
+  
