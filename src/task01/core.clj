@@ -2,9 +2,12 @@
   (:require [pl.danieljanus.tagsoup :refer :all])
   (:gen-class))
 
+;; сделано хорошо, небольшие замечания по тексту
 (defn traverse-and-collect [data acc]
   (reduce (fn [acc' v]
             (if (and (= :a (first v))
+;; вместо (get v 1) можно воспользоваться (second v), или если точно уверены что v - это вектор, 
+;; то можно написать (v 1) - поскольку вектора, maps - сами являются функциями
                      (= "l" (:class (get v 1))))
               (conj acc'
                     (:href (get v 1)))
