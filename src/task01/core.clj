@@ -4,26 +4,19 @@
 
 
 (defn get-links []
-" 1) Find all elements containing {:class \"r\"}.
-
-Example:
-[:h3 {:class \"r\"} [:a {:shape \"rect\", :class \"l\",
-                         :href \"https://github.com/clojure/clojure\",
-                         :onmousedown \"return rwt(this,'','','','4','AFQjCNFlSngH8Q4cB8TMqb710dD6ZkDSJg','','0CFYQFjAD','','',event)\"}
-                     [:em {} \"clojure\"] \"/\" [:em {} \"clojure\"] \" · GitHub\"]]
-
-   2) Extract href from the element :a.
-
-The link from the example above is 'https://github.com/clojure/clojure'.
-
-  3) Return vector of all 10 links.
-
-Example: ['https://github.com/clojure/clojure', 'http://clojure.com/', . . .]
-"
-  (let [data (parse "clojure_google.html")]
-    nil))
+  (let [data (vec (parse "clojure_google.html"))]
+;; defn определяет "top level" объект, так что лучше ее вынести за пределы функции 
+;; (get-links...)
+;; если же имеется необходимость определить функцию внутри другой функции, то можно воспользоваться (let [func (fn [...))
+;; или letfn.
+    (defn get-class-content [data accum]
+;; при использовании reduce, для читабельности удобней пользоваться (fn [arg1 arg2] - тогда легче будет понимать код
+      (reduce #(if (coll? %2)
+               (if-not (nil? (some #{{:class "r"}} %2))
+                  [(get %2 2)]
+                  (reduce conj % (get-class-content %2 %))))
+      accum data))
+    (map #(get-in % [1 :href]) (get-class-content data []))))
 
 (defn -main []
   (println (str "Found " (count (get-links)) " links!")))
-
-
